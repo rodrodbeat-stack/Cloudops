@@ -1,69 +1,80 @@
 const $ = (s, root=document) => root.querySelector(s);
 const $$ = (s, root=document) => [...root.querySelectorAll(s)];
 const toastRegion = $('#toastRegion');
-function toast(message){const el=document.createElement('div');el.className='toast';el.textContent=message;toastRegion.append(el);setTimeout(()=>el.remove(),3500)}
-function showDetails(title, rows){$('#dialogTitle').textContent=title;$('#dialogContent').innerHTML=`<table class="detail-table"><thead><tr><th>Control / componente</th><th>Estado</th><th>Detalle</th></tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;$('#detailDialog').showModal()}
-const detailData={
-'Overview':[['Governance Score','96%','48 de 50 políticas conformes'],['Security Findings','7 abiertos','1 crítico · 2 altos · 4 medios'],['Pipeline Success','98.4%','42 ejecuciones exitosas'],['Policy Violations','3 activas','Revisar recursos sin tags']],
-'Git Graph':[['payments-api','Healthy','main · release/v2.8 · feature/payment'],['platform-infra','Healthy','Terraform modules · Helm charts'],['observability','Healthy','Dashboards y alertas versionados']],
-'Governance':[['Policy compliance','96%','48 de 50 controles conformes'],['Resource tagging','97%','Owner, Environment, CostCenter'],['RBAC','Healthy','124 usuarios · mínimo privilegio'],['Cost management','Monitoring','Presupuestos y anomalías']],
-'Security':[['IAM policy drift','CRITICAL','Role app-prod con permisos adicionales'],['Secret scan','HIGH','Revisar repositorio payments'],['Encryption','Compliant','AES-256 at rest · TLS 1.3 in transit'],['Audit Trail','Enabled','1.248 eventos · retención 365 días']],
-'CI/CD':[['Source','Passed','Commit a3f9c2e'],['Build','Passed','Artefacto generado'],['SAST / QA','Passed','Análisis estático y pruebas OK'],['Security Gate','Warning','1 hallazgo pendiente de revisión'],['Deploy / Monitor','Healthy','v2.8.0 · health checks 3/5']],
-'Infrastructure':[['AWS','Operational','CloudTrail · Config · IAM'],['Azure','Operational','Azure Policy · Monitor'],['GCP','Operational','Audit Logs · Cloud Monitoring'],['Kubernetes','Healthy','Clusters y workloads supervisados'],['Terraform','Managed','Cambios IaC versionados']],
-'Audit Logs':[['14:42:03','INFO','Pipeline #482 completado'],['14:39:11','WARN','Tag requerido ausente en 3 recursos'],['14:31:44','CRITICAL','IAM policy drift detectado'],['14:18:07','INFO','Usuario r.rodriguez inició sesión']]
-};
-$$('.nav-item').forEach(btn=>btn.addEventListener('click',()=>{ $$('.nav-item').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const p=btn.dataset.page;$('#pageTitle').textContent=p;$('#crumb').textContent=p.toUpperCase();if(p!=='Overview')showDetails(p,detailData[p]||detailData.Overview);else toast('Overview actualizado · todos los sistemas operativos');}));
-$$('.env').forEach(btn=>btn.addEventListener('click',()=>{$$('.env').forEach(b=>b.classList.remove('active'));btn.classList.add('active');$('#pipelineEnv').textContent=btn.textContent;toast(`Entorno cambiado a ${btn.textContent}. Datos de demostración.`)}));
-$('#globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){const q=e.target.value.trim();if(q)showDetails(`Resultados: ${q}`,[['payments-api','Repository','Commit a3f9c2e'],['app-prod','IAM policy','Revisión recomendada'],['Pipeline #482','CI/CD','1 warning en Security Gate']]);}});
-$('#branchFilter').addEventListener('input',e=>{$$('.branch-label').forEach(el=>el.style.opacity=el.textContent.toLowerCase().includes(e.target.value.toLowerCase())?'1':'.12');});
-$('#repoFilter').addEventListener('change',e=>toast(`Repositorio seleccionado: ${e.target.value} · vista de demostración`));
-$('#refreshGraph').addEventListener('click',()=>{const graph=$('#graph');graph.animate([{opacity:.4},{opacity:1}],{duration:450});toast('Git Graph actualizado · commits sincronizados');});
-$('#viewAllWarnings').addEventListener('click',()=>showDetails('Live Warnings',[['CRITICAL','IAM policy drift','Role app-prod has extra permissions'],['HIGH','Secret scan failed','Potential exposed credential in payments'],['MEDIUM','Health check','api-gateway healthy 3/5'],['MEDIUM','Untagged resources','3 resources missing required tags']]));
-$$('.warning-card').forEach(card=>card.addEventListener('click',()=>{const title=$('strong',card).textContent;showDetails(title,[[$('.warn-meta b',card).textContent,'Open',$('p',card).textContent],['Recommended action','Investigate','Validate ownership, scope and remediation plan'],['Audit','Traceable','Attach remediation evidence before closure']]);}));
-$$('.stage').forEach(stage=>stage.addEventListener('click',()=>{const name=stage.dataset.stage;showDetails(`Pipeline stage · ${name}`,[['Stage',name,stage.classList.contains('warn')?'Warning':'Passed'],['Environment',$('#pipelineEnv').textContent,'Demo environment'],['Execution','Latest run','Pipeline #482 · last run 2 minutes ago'],['Traceability','Enabled','Commit a3f9c2e']]);}));
-$('#runPipeline').addEventListener('click',()=>{const stages=$$('.stage');const button=$('#runPipeline');button.disabled=true;button.textContent='⟳ Running pipeline...';stages.forEach(s=>{s.classList.remove('done','warn');s.style.opacity='.45';$('small',s).textContent='Queued';$('i',s).textContent='·'});let i=0;const tick=()=>{if(i>0){stages[i-1].style.opacity='1';stages[i-1].classList.add(i-1===4?'warn':'done');$('small',stages[i-1]).textContent=i-1===4?'1 issue':'Passed';$('i',stages[i-1]).textContent=i-1===4?'!':'✓'}if(i<stages.length){stages[i].style.opacity='1';$('small',stages[i]).textContent='Running';i++;setTimeout(tick,500)}else{button.disabled=false;button.textContent='▶ Run demo pipeline';toast('Pipeline demo completado: 6 stages OK · Security Gate con 1 warning');}};tick();});
-$('#pipelineView').addEventListener('click',()=>showDetails('CI/CD Pipeline',detailData['CI/CD']));
-$('#governanceDetails').addEventListener('click',()=>showDetails('Governance & Security',[['SOC 2','98%','Compliant'],['ISO 27001','95%','2 controls to review'],['NIST','93%','Continuous monitoring'],['PCI-DSS','90%','Payment environment controls'],['RBAC','Healthy','Least privilege']]));
-$('#alertsBtn').addEventListener('click',()=>$('#warnings').scrollIntoView({behavior:'smooth',block:'center'}));
-$('#closeDialog').addEventListener('click',()=>$('#detailDialog').close());
-$('#aiOpen').addEventListener('click',()=>$('#aiDialog').showModal());$('#closeAi').addEventListener('click',()=>$('#aiDialog').close());
-$('#chatForm').addEventListener('submit', e => {
-    e.preventDefault();
-
-    const input = $('#chatInput');
-    const question = input.value.trim();
-
-    if (!question) return;
-
-    const log = $('#chatLog');
-    const user = document.createElement('div');
-
-    user.className = 'chat-bubble user';
-    user.textContent = question;
-    log.append(user);
-
-    const bot = document.createElement('div');
-    bot.className = 'chat-bubble bot';
-
-    const q = question.toLowerCase();
-
-    if (q.includes('seguridad') || q.includes('vulnerabilidad') || q.includes('iam')) {
-        bot.textContent = 'Seguridad: 7 hallazgos simulados. Hay 1 crítico, 2 altos y 4 medios. Revisa los permisos IAM y el análisis de secretos.';
-    } else if (q.includes('pipeline') || q.includes('cicd') || q.includes('deploy')) {
-        bot.textContent = 'CI/CD: el dashboard muestra un 98,4% de éxito simulado. Revisa el Security Gate antes de desplegar.';
-    } else if (q.includes('governance') || q.includes('gobernanza') || q.includes('policy') || q.includes('tag')) {
-        bot.textContent = 'Governance: puntuación simulada del 96%, con 48 de 50 políticas conformes y 3 recursos sin etiquetas obligatorias.';
-    } else if (q.includes('aws') || q.includes('azure') || q.includes('gcp') || q.includes('infraestructura')) {
-        bot.textContent = 'Infrastructure: AWS, Azure y GCP aparecen como conectores de demostración. Todavía no hay conexión con servicios reales.';
-    } else {
-        bot.textContent = 'CloudOps Assistant: puedo ayudarte con seguridad, CI/CD, gobernanza e infraestructura. Los indicadores actuales son datos de demostración.';
-    }
-
-    log.append(bot);
-    input.value = '';
-    log.scrollTop = log.scrollHeight;
-});
-
-if ($('#clock')) {
-    $('#clock').textContent = 'Updated just now';
+function toast(message){const el=document.createElement('div');el.className='toast';el.textContent=message;toastRegion.append(el);setTimeout(()=>el.remove(),3600)}
+function updateClock(){const now=new Date();$('#clock').textContent=now.toLocaleTimeString('es-CL',{hour12:false})}
+updateClock();setInterval(updateClock,1000);
+const pageNames={overview:['OVERVIEW','Control Plane'],git:['GIT GRAPH','Git Graph'],security:['SECURITY','Security Center'],governance:['GOVERNANCE','Governance'],cicd:['CI/CD PIPELINE','Secure Delivery'],infrastructure:['INFRASTRUCTURE','Infrastructure'],audit:['AUDIT LOGS','Audit Logs']};
+function jump(id){const target=document.getElementById(id);if(!target)return;target.scrollIntoView({behavior:'smooth',block:'start'});$$('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.target===id));const info=pageNames[id]||['OVERVIEW','Control Plane'];$('#crumb').textContent=info[0];$('#pageTitle').innerHTML=info[1]+'<span class="accent">.</span>'}
+$$('.nav-item').forEach(btn=>btn.addEventListener('click',()=>jump(btn.dataset.target)));
+$$('[data-jump]').forEach(btn=>btn.addEventListener('click',()=>jump(btn.dataset.jump)));
+$$('.env').forEach(btn=>btn.addEventListener('click',()=>{ $$('.env').forEach(x=>x.classList.toggle('active',x===btn));const env=btn.dataset.env;$('#currentEnv').textContent=env;$('#pipelineEnvLabel').textContent=env;$('#pipelineEnvLabel').parentElement.lastElementChild.textContent=env;toast(`Entorno activo cambiado a ${env}. Demo solamente.`)}));
+$('#refreshBtn').addEventListener('click',()=>{toast('Panel actualizado con los datos de demostración.');$('#refreshBtn').textContent='✓ Updated';setTimeout(()=>$('#refreshBtn').textContent='↻ Refresh',1200)});
+$('#refreshGraph').addEventListener('click',()=>toast('Git Graph actualizado: 3 repositorios de demostración.'));
+$('#alertsBtn').addEventListener('click',()=>{jump('security');toast('Hay 7 hallazgos simulados: 1 crítico, 2 altos y 4 medios.')});
+$('#pipelineView')?.addEventListener('click',()=>jump('cicd'));
+const repoFilter=$('#repoFilter');repoFilter?.addEventListener('change',()=>{const repo=repoFilter.value;$('#pipelineRepo').textContent=repo==='all'?'payments-api':repo;toast(repo==='all'?'Mostrando todos los repositorios de demo.':`Repositorio seleccionado: ${repo}`)});
+$('#branchFilter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();$$('.branch-names span').forEach(x=>x.classList.toggle('hidden',q&&!x.textContent.toLowerCase().includes(q)));if(q&&!$$('.branch-names span').some(x=>x.textContent.toLowerCase().includes(q)))toast('No se encontró una rama con ese nombre.')});
+$('#globalSearch').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const q=e.target.value.trim().toLowerCase();if(!q)return;const map=[['git','git graph branch repository commit'],['security','security risk vulnerability iam secret'],['governance','governance policy compliance audit'],['cicd','pipeline cicd build deploy sast qa'],['infrastructure','infrastructure aws azure gcp kubernetes'],['audit','audit log event trace']];const match=map.find(([,words])=>words.split(' ').some(w=>q.includes(w)||w.includes(q)));if(match){jump(match[0]);toast(`Resultados relacionados con: ${e.target.value}`)}else{const found=$$('.warning-card').find(x=>x.textContent.toLowerCase().includes(q));if(found){jump('security');found.scrollIntoView({behavior:'smooth',block:'center'})}else toast('Sin coincidencias en los datos de demostración.')} });
+const dialog=$('#detailDialog');function openDetail(title,body){$('#dialogTitle').textContent=title;$('#dialogContent').innerHTML=body;dialog.showModal()}
+$$('[data-detail]').forEach(btn=>btn.addEventListener('click',()=>{const title=btn.dataset.detail;openDetail(title,`<p><b>Estado:</b> requiere revisión en este entorno de demostración.</p><p><b>Acción recomendada:</b> validar el propietario, revisar los eventos relacionados y registrar la remediación en el flujo de auditoría.</p><p><b>Entorno:</b> ${$('#currentEnv').textContent}. <span style="color:#ffae42">No se ejecutan cambios reales en la nube.</span></p>`)}));
+$$('[data-detail="Governance controls"]').forEach(btn=>btn.addEventListener('click',()=>openDetail('Governance controls','<ul><li>Identidad y acceso: RBAC y mínimo privilegio.</li><li>Protección de datos: cifrado y gestión de claves.</li><li>Etiquetado: owner, environment, cost center.</li><li>Auditoría: trazabilidad de cambios y retención de logs.</li></ul>')));
+$('#closeDialog').addEventListener('click',()=>dialog.close());$('#viewAllWarnings').addEventListener('click',()=>{jump('security');openDetail('Security findings','<p><b>1 crítico:</b> IAM policy drift.</p><p><b>2 altos:</b> secret scan y vulnerabilidades de dependencias.</p><p><b>4 medios:</b> observabilidad, tags y controles de configuración.</p><p>Estos hallazgos son datos ilustrativos, no un escaneo real.</p>')});
+const pipeline=$('#pipelineFlow');
+let running=false;
+const graphSvg=$('.git-svg');
+const branchPaths=graphSvg ? [...graphSvg.querySelectorAll('.main-branch,.release-branch,.feature-branch')] : [];
+let branchRunners=[];
+function clearBranchRunners(){branchRunners.forEach(x=>x.remove());branchRunners=[];graphSvg?.classList.remove('pipeline-graph-running');}
+function createBranchRunners(){
+  if(!graphSvg || !branchPaths.length) return;
+  clearBranchRunners(); graphSvg.classList.add('pipeline-graph-running');
+  branchPaths.forEach((path,index)=>{
+    const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('r',index===0?'6':'5'); dot.setAttribute('class',`branch-runner runner-${index}`);
+    graphSvg.appendChild(dot); branchRunners.push(dot);
+  });
 }
+function moveBranchRunners(progress){
+  branchPaths.forEach((path,index)=>{
+    const dot=branchRunners[index]; if(!dot) return;
+    const length=path.getTotalLength();
+    const point=path.getPointAtLength(Math.min(length,Math.max(0,length*progress)));
+    dot.setAttribute('cx',point.x); dot.setAttribute('cy',point.y);
+  });
+}
+$('#runPipeline')?.addEventListener('click',async()=>{
+  if(running) return;
+  running=true;
+  const button=$('#runPipeline');
+  const stages=$$('.stage',pipeline);
+  const connectors=$$('.connector',pipeline);
+  button.disabled=true; button.textContent='⟳ Running pipeline...';
+  pipeline.classList.add('is-running');
+  stages.forEach((stage)=>{stage.classList.remove('done','warn','is-active');stage.querySelector('small').textContent='Queued';stage.querySelector('i').textContent='○'});
+  connectors.forEach(connector=>connector.classList.remove('connector-done'));
+  createBranchRunners();
+  toast('Pipeline iniciado: observa el progreso en CI/CD y en las ramas del Git Graph.');
+  for(let i=0;i<stages.length;i++){
+    const stage=stages[i]; stage.classList.add('is-active');
+    stage.querySelector('small').textContent='Running'; stage.querySelector('i').textContent='…';
+    const start=performance.now(),duration=850;
+    await new Promise(resolve=>{
+      function tick(now){const p=Math.min(1,(now-start)/duration);moveBranchRunners(Math.min(1,(i+p)/stages.length));if(p<1)requestAnimationFrame(tick);else resolve();}
+      requestAnimationFrame(tick);
+    });
+    stage.classList.remove('is-active');
+    if(i===3){stage.classList.add('warn');stage.querySelector('small').textContent='1 issue';stage.querySelector('i').textContent='!';}
+    else {stage.classList.add('done');stage.querySelector('small').textContent='Passed';stage.querySelector('i').textContent='✓';}
+    if(connectors[i]) connectors[i].classList.add('connector-done');
+  }
+  pipeline.classList.remove('is-running');
+  moveBranchRunners(1);
+  button.disabled=false; button.textContent='▶ Run demo pipeline'; running=false;
+  toast('Pipeline demo completado. El Security Gate detectó 1 hallazgo; Deploy queda como simulación y no publica cambios reales.');
+  setTimeout(clearBranchRunners,1800);
+});
+$('#aiOpen').addEventListener('click',()=>$('#aiDialog').showModal());$('#closeAi').addEventListener('click',()=>$('#aiDialog').close());
+const replies=[[/security|riesgo|vulnerab|alerta|critical|cr[ií]tic/i,'Hay 7 hallazgos simulados: 1 crítico de IAM, 2 altos y 4 medios. Prioriza revisar permisos de app-prod y comprobar que no existan secretos en el repositorio.'],[/pipeline|cicd|deploy|desplieg/i,'El flujo demo contiene Source, Build, SAST/QA, Security Gate, Deploy y Monitor. El Security Gate muestra 1 incidencia. El botón Run demo pipeline solo anima la simulación; no despliega nada.'],[/governance|gobern|policy|pol[ií]tica|compliance|cumplimiento/i,'El score de gobernanza es 96% (dato de ejemplo), con 48 de 50 controles conformes. Revisa Resource Tagging y confirma owner, environment y cost center.'],[/infra|aws|azure|gcp|kubernetes|cloud/i,'La vista de infraestructura muestra conectores de demostración para AWS, Azure, Google Cloud y Kubernetes. No hay cuentas cloud conectadas ni telemetría real.'],[/git|repo|branch|rama|commit/i,'El Git Graph representa ramas main, release/v2.8 y feature/security. Los commits y repositorios mostrados son datos ficticios de demostración.'],[/audit|log|trazab/i,'Audit Logs contiene eventos de ejemplo de CI bot, operador, motor de seguridad y Terraform bot. Para producción, conecta un backend de logs y define retención y control de acceso.']];
+$('#chatForm').addEventListener('submit',e=>{e.preventDefault();const input=$('#chatInput'),q=input.value.trim();if(!q)return;const user=document.createElement('div');user.className='chat-bubble user';user.textContent=q;$('#chatLog').append(user);const match=replies.find(([re])=>re.test(q));const bot=document.createElement('div');bot.className='chat-bubble bot';bot.textContent=match?match[1]:'Puedo orientarte sobre seguridad, CI/CD, gobernanza, Git Graph, infraestructura y auditoría. Prueba preguntando por uno de esos módulos.';$('#chatLog').append(bot);input.value='';$('#chatLog').scrollTop=$('#chatLog').scrollHeight});
+// All dashboard values and integrations are explicitly demo-only.
