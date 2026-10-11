@@ -74,3 +74,10 @@ In the repository, open **Settings → Pages** and configure **Build and deploym
 ### CI/CD en vivo desde GitHub Actions
 
 El dashboard `cicd.html` consulta `GET /repos/rodrodbeat-stack/Cloudops/actions/workflows/secure-cicd.yml/runs` y el endpoint de jobs de la ejecución más reciente. Las tarjetas corresponden a Commit, CI Validation, Security Scan, Policy Validation, Package Artifact, Deployment y Audit & Evidence. Esto es una vista de solo lectura: no inicia workflows ni modifica infraestructura. Para publicar correctamente, habilita **Settings → Pages → Source: GitHub Actions** y confirma que `.github/workflows/secure-cicd.yml` esté en `main`.
+
+
+## Secure CI/CD workflow jobs
+
+The `secure-cicd.yml` workflow includes independent jobs for CI validation, JavaScript code quality, secret scanning, local-link validation, static asset budget, governance policy validation, Pages artifact packaging, deployment, and audit evidence. Jobs are executed by GitHub Actions on `push` to `main`, pull requests targeting `main`, or manual `workflow_dispatch`.
+
+The CI/CD dashboard is a read-only view of the latest public workflow run; its “Run demo pipeline” button remains a local visual simulation and does not trigger GitHub Actions.
