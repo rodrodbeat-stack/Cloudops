@@ -33,3 +33,11 @@ Todo es una simulación visual local. No se conectan runners, repositorios, cuen
 ## Dashboards por entorno
 
 Los botones DEV, QA, STAGING y PROD abren `environment.html?env=...`, un dashboard separado por entorno con métricas y acciones de demostración. Los botones no realizan cambios reales en AWS, Azure ni Kubernetes.
+
+
+## Infrastructure Architecture Graph
+- Los cuadros AWS, Azure, Google Cloud y Kubernetes del módulo Infrastructure abren `infrastructure.html` con la arquitectura seleccionada.
+- El grafo permite seleccionar componentes, consultar detalles y resaltar dependencias.
+- `Run traffic flow` anima conexiones y registra eventos de simulación.
+- Los diagramas y métricas son ilustrativos; no representan cuentas ni tráfico cloud reales.
+- Archivos añadidos: `infrastructure.html`, `infrastructure.css`, `infrastructure.js`.
