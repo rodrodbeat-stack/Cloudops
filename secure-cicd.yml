@@ -1,0 +1,120 @@
+name: '888DIGITALFACTORY | Secure CI/CD'
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudops-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci-validation:
+    name: '1 · CI validation'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Validate dashboard files
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in index.html styles.css app.js; do
+            test -s "$file" || { echo "::error file=$file::Required file missing or empty"; exit 1; }
+            echo "OK: $file"
+          done
+          grep -Eiq '<!doctype html|<html' index.html || { echo '::error::index.html is not a valid HTML document'; exit 1; }
+
+  code-quality:
+    name: '2 · JavaScript quality'
+    runs-on: ubuntu-latest
+    needs: ci-validation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: node --check app.js
+
+  security-scan:
+    name: '3 · Security scan'
+    runs-on: ubuntu-latest
+    needs: ci-validation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan tracked files for common hard-coded secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RniE --exclude-dir=.git --exclude='*.md' '(AKIA[0-9A-Z]{16}|-----BEGIN ([A-Z ]+ )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9_]{20,})' .; then
+            echo '::error::Potential hard-coded secret found; review the matching line.'
+            exit 1
+          fi
+          echo 'No common hard-coded secret patterns found.'
+
+  performance-budget:
+    name: '4 · Static asset budget'
+    runs-on: ubuntu-latest
+    needs: ci-validation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce 10 MiB static asset budget
+        shell: bash
+        run: |
+          set -euo pipefail
+          total_bytes=$(find . -maxdepth 2 -type f \( -name '*.html' -o -name '*.css' -o -name '*.js' \) -not -path './.git/*' -printf '%s\n' | awk '{s+=$1} END {print s+0}')
+          echo "Static assets: $((total_bytes / 1024)) KiB"
+          test "$total_bytes" -le 10485760 || { echo '::error::Static assets exceed 10 MiB'; exit 1; }
+
+  policy-validation:
+    name: '5 · Repository policy'
+    runs-on: ubuntu-latest
+    needs: [ci-validation, code-quality, security-scan, performance-budget]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify public dashboard does not contain a GitHub token
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RniE --exclude-dir=.git --exclude='*.md' 'github_pat_[A-Za-z0-9_]{20,}|ghp_[A-Za-z0-9]{20,}' .; then
+            echo '::error::A GitHub token-like value was found in the repository.'
+            exit 1
+          fi
+          echo 'Repository policy checks passed.'
+
+  audit:
+    name: '6 · Audit evidence'
+    if: always()
+    needs: [ci-validation, code-quality, security-scan, performance-budget, policy-validation]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Write run summary
+        shell: bash
+        env:
+          CI_RESULT: ${{ needs.ci-validation.result }}
+          QUALITY_RESULT: ${{ needs.code-quality.result }}
+          SECURITY_RESULT: ${{ needs.security-scan.result }}
+          PERFORMANCE_RESULT: ${{ needs.performance-budget.result }}
+          POLICY_RESULT: ${{ needs.policy-validation.result }}
+        run: |
+          {
+            echo '## 888DIGITALFACTORY — CI/CD Audit'
+            echo
+            echo "- Repository: ${GITHUB_REPOSITORY}"
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo
+            echo '| Job | Result |'
+            echo '|---|---|'
+            echo "| CI validation | ${CI_RESULT} |"
+            echo "| JavaScript quality | ${QUALITY_RESULT} |"
+            echo "| Security scan | ${SECURITY_RESULT} |"
+            echo "| Static asset budget | ${PERFORMANCE_RESULT} |"
+            echo "| Repository policy | ${POLICY_RESULT} |"
+          } >> "$GITHUB_STEP_SUMMARY"
