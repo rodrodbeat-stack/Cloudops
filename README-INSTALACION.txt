@@ -1,4 +1,4 @@
-888DIGITALFACTORY CloudOps — GitHub Actions workflow + sync helper
+888DIGITALFACTORY CloudOps — GitHub Actions workflow + sync helper.
 
 ESTRUCTURA INCLUIDA
 - .github/workflows/secure-cicd.yml: workflow que crea jobs reales en GitHub Actions.
