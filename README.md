@@ -3,7 +3,7 @@
 Dashboard web estático de demostración para CloudOps / DevSecOps con estética oscura, acentos neón, navegación por módulos e interacciones locales.
 
 ## Incluye
-- Overview con métricas de gobernanza, seguridad, pipeline y políticas.
+- Overview con métricas de gobernanza, seguridad, pipeline y políticas.g
 - Git Graph visual con ramas `main`, `release/v2.8` y `feature/security`.
 - Centro de hallazgos de seguridad y controles Zero Trust.
 - Flujo CI/CD simulado: Source → Build → SAST/QA → Security Gate → Deploy → Monitor.
