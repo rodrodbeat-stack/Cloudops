@@ -1,4 +1,4 @@
-name: '888DIGITALFACTORY | Secure CI/CD'
+name: '888DIGITAL-FACTORY | Secure CI/CD'
 
 on:
   push:
