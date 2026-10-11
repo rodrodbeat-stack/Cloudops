@@ -1,50 +1,92 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#041126">
-<title>NEXUS // Control Plane</title>
-<link rel="stylesheet" href="styles.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXUS // Control Plane</title><link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="app-shell">
   <aside class="sidebar">
-    <a class="brand" href="#" data-page="overview">
-      <span class="brand-mark">N</span><span><strong>NEXUS <i>//</i></strong><small>CONTROL PLANE</small><em>GOVERNANCE · SECURITY · CI/CD</em></span>
-    </a>
-    <div class="nav-label">WORKSPACE</div>
+    <div class="brand"><div class="logo">◆</div><div><div class="brand-name">NEXUS <span>//</span> <small>CONTROL PLANE</small></div><div class="tagline">GOVERNANCE · SECURITY · CI/CD · OBSERVABILITY</div></div></div>
     <nav id="nav">
-      <button class="nav-item active" data-page="overview"><span>⌂</span>Overview</button>
-      <button class="nav-item" data-page="git"><span>⑂</span>Git Graph</button>
-      <button class="nav-item" data-page="governance"><span>⬡</span>Governance</button>
-      <button class="nav-item" data-page="security"><span>⛨</span>Security</button>
-      <button class="nav-item" data-page="cicd"><span>∞</span>CI/CD</button>
-      <button class="nav-item" data-page="infrastructure"><span>☁</span>Infrastructure</button>
-      <button class="nav-item" data-page="audit"><span>▤</span>Audit Logs</button>
+      <button class="nav-item active" data-page="Overview"><b>⌂</b>Overview</button>
+      <button class="nav-item" data-page="Git Graph"><b>⑂</b>Git Graph</button>
+      <button class="nav-item" data-page="Governance"><b>⬡</b>Governance</button>
+      <button class="nav-item" data-page="Security"><b>♢</b>Security</button>
+      <button class="nav-item" data-page="CI/CD"><b>∞</b>CI/CD</button>
+      <button class="nav-item" data-page="Infrastructure"><b>☁</b>Infrastructure</button>
+      <button class="nav-item" data-page="Audit Logs"><b>▤</b>Audit Logs</button>
     </nav>
-    <div class="sidebar-bottom">
-      <div class="assistant-card"><div class="assistant-title">✳ AI ASSISTANT <span>↗</span></div><p>Explora el estado del entorno, las políticas y tus pipelines.</p><button id="askAssistant">Abrir asistente →</button></div>
-      <div class="cloud-legend"><span>☁ AWS</span><span>◈ Azure</span><span>⬡ GCP</span><span>⎈ K8s</span><span>⚙ Terraform</span></div>
-    </div>
+    <button class="ai-card" id="aiOpen"><div class="ai-title">✳ AI Assistant <span>→</span></div><p>Ask about your environment, policies or pipeline status...</p></button>
+    <div class="sidebar-foot"><span>☁ AWS</span><span>◈ Azure</span><span>◆ GCP</span></div>
   </aside>
   <main class="main">
     <header class="topbar">
-      <div class="mobile-brand">NEXUS <i>//</i></div>
-      <div class="env-switch" aria-label="Entorno"><button class="selected" data-env="PROD">PROD</button><button data-env="STAGING">STAGING</button><button data-env="DEV">DEV</button></div>
-      <label class="search"><span>⌕</span><input id="globalSearch" placeholder="Buscar repos, servicios, commits, políticas..."><kbd>↵</kbd></label>
-      <div class="system-status"><span class="pulse"></span><div><b>SYSTEM OPERATIONAL</b><small>Todos los sistemas saludables</small></div></div>
-      <button class="icon-button" id="notifications" title="Notificaciones">♧<sup>3</sup></button><button class="icon-button" title="Configuración" id="settings">⚙</button>
+      <div class="env-switch"><button class="env active">PROD</button><button class="env">STAGING</button><button class="env">DEV</button></div>
+      <label class="search">⌕ <input id="globalSearch" placeholder="Search repos, services, commits, policies..."></label>
+      <div class="system-status"><i></i><div><strong>SYSTEM OPERATIONAL</strong><small>All systems healthy</small></div></div>
+      <button class="icon-button" id="alertsBtn" title="Alertas">♧<em>3</em></button><button class="icon-button" title="Usuarios">♙</button><button class="icon-button" title="Configuración">⚙</button>
     </header>
-    <section class="content">
-      <div class="page-heading"><div><div class="eyebrow">NEXUS / CONTROL CENTER</div><h1 id="pageTitle">Overview <span>↗</span></h1><p id="pageSubtitle">Vista operativa unificada de tu plataforma cloud.</p></div><div class="heading-actions"><span class="updated"><span class="pulse"></span> Datos de demostración</span><button class="btn-outline" id="refresh">↻ Actualizar</button></div></div>
-      <div id="pageContent"></div>
-      <footer><span>NEXUS CONTROL PLANE <b>v2.8.0</b></span><span>Secure · Compliant · Always On</span></footer>
+    <section class="page-heading"><div><div class="eyebrow">CONTROL CENTER / <span id="crumb">OVERVIEW</span></div><h1 id="pageTitle">Overview <span class="live-pill">LIVE</span></h1></div><div class="updated">● Live telemetry <span id="clock">Updated just now</span></div></section>
+    <section class="metrics">
+      <article class="panel metric purple"><div class="metric-head"><span class="metric-icon">⬡</span><span>Governance Score</span><button class="dots">•••</button></div><div class="metric-value">96<small>%</small><span class="trend up">↑ 2% <small>vs. last 7d</small></span></div><div class="sparkline line-purple"><svg viewBox="0 0 280 55" preserveAspectRatio="none"><polyline points="0,43 18,37 36,40 54,28 72,34 90,24 108,31 126,22 144,25 162,12 180,20 198,18 216,9 234,17 252,4 270,11 280,5"/></svg></div><div class="metric-rows"><span>● Policies Compliant <b>48 / 50</b></span><span>● Resource Coverage <b>98%</b></span><span>● Tagging Compliance <b>97%</b></span></div></article>
+      <article class="panel metric red"><div class="metric-head"><span class="metric-icon">♙</span><span>Security Findings</span><button class="dots">•••</button></div><div class="metric-value">07 <span class="trend down">↓ 62% <small>vs. last 7d</small></span></div><div class="bars red-bars"><i style="height:28%"></i><i style="height:54%"></i><i style="height:32%"></i><i style="height:23%"></i><i style="height:38%"></i><i style="height:35%"></i><i style="height:48%"></i><i style="height:80%"></i><i style="height:58%"></i><i style="height:68%"></i></div><div class="metric-rows"><span><i class="dot critical"></i> Critical <b>1</b></span><span><i class="dot high"></i> High <b>2</b></span><span><i class="dot medium"></i> Medium <b>4</b></span><span><i class="dot low"></i> Low <b>0</b></span></div></article>
+      <article class="panel metric cyan"><div class="metric-head"><span class="metric-icon">∞</span><span>Pipeline Success</span><button class="dots">•••</button></div><div class="metric-value">98.4<small>%</small><span class="trend up">↑ 1.2% <small>vs. last 7d</small></span></div><div class="bars cyan-bars"><i style="height:30%"></i><i style="height:48%"></i><i style="height:34%"></i><i style="height:44%"></i><i style="height:40%"></i><i style="height:60%"></i><i style="height:36%"></i><i style="height:52%"></i><i style="height:82%"></i><i style="height:63%"></i><i style="height:94%"></i></div><div class="metric-rows"><span><i class="dot success"></i> Successful <b>42</b></span><span><i class="dot medium"></i> Failed <b>1</b></span><span><i class="dot blue"></i> In Progress <b>1</b></span><span><i class="dot low"></i> Skipped <b>0</b></span></div></article>
+      <article class="panel metric orange"><div class="metric-head"><span class="metric-icon">▤</span><span>Policy Violations</span><button class="dots">•••</button></div><div class="metric-value">03 <span class="trend up">↓ 70% <small>vs. last 7d</small></span></div><div class="bars orange-bars"><i style="height:18%"></i><i style="height:32%"></i><i style="height:22%"></i><i style="height:54%"></i><i style="height:35%"></i><i style="height:46%"></i><i style="height:64%"></i><i style="height:78%"></i><i style="height:56%"></i><i style="height:93%"></i></div><div class="metric-rows"><span><i class="dot critical"></i> Critical <b>1</b></span><span><i class="dot high"></i> High <b>1</b></span><span><i class="dot medium"></i> Medium <b>1</b></span><span><i class="dot low"></i> Low <b>0</b></span></div></article>
     </section>
+    <section class="middle-grid">
+      <article class="panel git-panel">
+        <div class="panel-title"><div><span class="title-icon">⑂</span><h2>Git Graph</h2></div><select id="repoFilter"><option>All Repositories</option><option>payments-api</option><option>platform-infra</option><option>observability</option></select><input id="branchFilter" class="branch-filter" placeholder="Filter branches..."><button class="subtle-btn" id="refreshGraph">↻</button></div>
+        <div class="git-content"><div class="graph" id="graph">
+          <svg viewBox="0 0 520 330" preserveAspectRatio="none" aria-label="Git branch graph">
+            <g class="grid-lines"><path d="M0 25H520 M0 70H520 M0 115H520 M0 160H520 M0 205H520 M0 250H520 M0 295H520"/><path d="M55 0V330 M110 0V330 M165 0V330 M220 0V330 M275 0V330 M330 0V330 M385 0V330 M440 0V330 M495 0V330"/></g>
+            <path class="branch purple-line" d="M0 25 H510"/><path class="branch cyan-line" d="M0 70 H140 C165 70 155 120 190 120 H235 C260 120 245 180 275 180 H330 C355 180 345 70 380 70 H510"/>
+            <path class="branch blue-line" d="M0 115 H120 C160 115 140 165 180 165 H240 C260 165 250 205 290 205 H510"/>
+            <path class="branch green-line" d="M0 160 H155 C190 160 175 230 220 230 H330 C365 230 350 180 380 180 H430 C455 180 450 250 480 250 H510"/>
+            <path class="branch orange-line" d="M0 205 H115 C150 205 135 270 175 270 H300 C330 270 325 245 355 245 H420 C455 245 450 205 480 205 H510"/>
+            <path class="branch violet-line" d="M0 250 H150 C180 250 175 300 220 300 H400 C435 300 420 280 455 280 H510"/>
+            <g class="nodes purple-nodes"><circle cx="55" cy="25" r="4"/><circle cx="120" cy="25" r="4"/><circle cx="180" cy="25" r="4"/><circle cx="245" cy="25" r="4"/><circle cx="310" cy="25" r="4"/><circle cx="390" cy="25" r="4"/><circle cx="455" cy="25" r="4"/></g>
+            <g class="nodes cyan-nodes"><circle cx="140" cy="70" r="4"/><circle cx="190" cy="120" r="4"/><circle cx="275" cy="180" r="5"/><circle cx="380" cy="70" r="5"/></g>
+            <g class="nodes blue-nodes"><circle cx="120" cy="115" r="4"/><circle cx="180" cy="165" r="4"/><circle cx="290" cy="205" r="4"/><circle cx="430" cy="205" r="4"/></g>
+            <g class="nodes green-nodes"><circle cx="155" cy="160" r="4"/><circle cx="220" cy="230" r="4"/><circle cx="330" cy="230" r="4"/><circle cx="430" cy="180" r="4"/></g>
+            <g class="nodes orange-nodes"><circle cx="115" cy="205" r="4"/><circle cx="175" cy="270" r="4"/><circle cx="300" cy="270" r="4"/><circle cx="420" cy="245" r="4"/></g>
+            <g class="nodes violet-nodes"><circle cx="150" cy="250" r="4"/><circle cx="220" cy="300" r="4"/><circle cx="400" cy="300" r="4"/><circle cx="455" cy="280" r="4"/></g>
+          </svg>
+          <div class="branch-label label-main">♟ main</div><div class="branch-label label-release">⑂ release/v2.8</div><div class="branch-label label-dev">♟ develop</div><div class="branch-label label-auth">♟ feature/auth</div><div class="branch-label label-pay">♟ feature/payment</div><div class="branch-label label-obs">♟ feature/observability</div>
+        </div><div class="commit-list"><div class="commit-head"><span>Commit</span><span>Message</span><span>Author</span><span>Time</span></div><div class="commit"><code>a3f9c2e</code><span>Merge pull request #482 ...</span><span>r.rodriguez</span><time>2h ago</time></div><div class="commit"><code>7e4d1ab</code><span>Release v2.8.0</span><span>r.rodriguez</span><time>4h ago</time></div><div class="commit"><code>c9b8f73</code><span>Update helm chart</span><span>j.lopez</span><time>6h ago</time></div><div class="commit"><code>5d2e1f0</code><span>Add auth middleware</span><span>m.torres</span><time>8h ago</time></div><div class="commit"><code>3a6f9c1</code><span>Fix pipeline config</span><span>d.garcia</span><time>10h ago</time></div><div class="commit"><code>8e3f4b2</code><span>Merge feature/payment</span><span>r.rodriguez</span><time>12h ago</time></div><div class="commit"><code>6b7d2a9</code><span>Update monitoring alerts</span><span>m.torres</span><time>14h ago</time></div><div class="commit"><code>4c1e9d3</code><span>Update Dockerfile</span><span>j.lopez</span><time>16h ago</time></div><div class="commit"><code>2f8a7c6</code><span>Merge feature/observability</span><span>r.rodriguez</span><time>18h ago</time></div></div></div>
+      </article>
+      <aside class="panel warnings-panel" id="warnings">
+        <div class="panel-title"><div><span class="warning-sign">⚠</span><h2>LIVE WARNINGS</h2></div><button class="text-btn" id="viewAllWarnings">View all →</button></div>
+        <div class="warning-list">
+          <button class="warning-card critical"><div class="warn-symbol">⬡</div><div><div class="warn-meta"><b>CRITICAL</b><span>12 min ago</span></div><strong>IAM policy drift detected</strong><p>Role 'app-prod' has extra permissions.</p><label>Security</label></div></button>
+          <button class="warning-card high"><div class="warn-symbol">♧</div><div><div class="warn-meta"><b>HIGH</b><span>27 min ago</span></div><strong>Pipeline secret scan failed</strong><p>Potential exposed credential in repo 'payments'.</p><label>CI/CD</label></div></button>
+          <button class="warning-card medium"><div class="warn-symbol">♧</div><div><div class="warn-meta"><b>MEDIUM</b><span>1 h ago</span></div><strong>Prod deployment awaiting health check</strong><p>Service 'api-gateway' is not healthy (3/5).</p><label>Deploy</label></div></button>
+          <button class="warning-card medium"><div class="warn-symbol">◇</div><div><div class="warn-meta"><b>MEDIUM</b><span>2 h ago</span></div><strong>Policy violation: untagged resources</strong><p>3 resources without required tags.</p><label>Governance</label></div></button>
+        </div>
+      </aside>
+    </section>
+    <section class="bottom-grid">
+      <article class="panel pipeline-panel"><div class="panel-title"><div><span class="title-icon cyan-text">♧</span><h2>CI/CD Pipeline</h2></div><div class="panel-actions"><span>Last run: 2m ago</span><button class="text-btn" id="pipelineView">View all →</button></div></div>
+        <div class="pipeline-flow" id="pipelineFlow">
+          <button class="stage done" data-stage="Source"><span class="stage-icon">&lt;/&gt;</span><i>✓</i><strong>Source</strong><small>main</small><time>2m ago</time></button><span class="arrow">→</span>
+          <button class="stage done" data-stage="Build"><span class="stage-icon">⬡</span><i>✓</i><strong>Build</strong><small>#482</small><time>2m ago</time></button><span class="arrow">→</span>
+          <button class="stage done" data-stage="SAST"><span class="stage-icon">♢</span><i>✓</i><strong>SAST</strong><small>Passed</small><time>3m ago</time></button><span class="arrow">→</span>
+          <button class="stage done" data-stage="QA"><span class="stage-icon">⚗</span><i>✓</i><strong>QA</strong><small>Tests OK</small><time>4m ago</time></button><span class="arrow orange-arrow">→</span>
+          <button class="stage warn" data-stage="Security Gate"><span class="stage-icon">♙</span><i>!</i><strong>Security Gate</strong><small>1 issue</small><time>5m ago</time></button><span class="arrow">→</span>
+          <button class="stage done" data-stage="Deploy"><span class="stage-icon">➤</span><i>✓</i><strong>Deploy</strong><small>v2.8.0</small><time>6m ago</time></button><span class="arrow">→</span>
+          <button class="stage done" data-stage="Monitor"><span class="stage-icon">⌁</span><i>✓</i><strong>Monitor</strong><small>Healthy</small><time>Now</time></button>
+        </div><div class="pipeline-footer"><span><i class="dot success"></i> 6 stages passed</span><span><i class="dot medium"></i> 1 warning</span><span>Environment: <b id="pipelineEnv">PROD</b></span><button id="runPipeline" class="run-btn">▶ Run demo pipeline</button></div>
+      </article>
+      <article class="panel governance-panel"><div class="panel-title"><div><span class="title-icon">⬡</span><h2>Governance &amp; Security</h2></div><button class="text-btn" id="governanceDetails">View details →</button></div>
+        <div class="governance-body"><div class="compliance"><h3>Compliance</h3><div class="compliance-row"><span>SOC 2 <b>98%</b></span><div><i style="width:98%"></i></div></div><div class="compliance-row"><span>ISO 27001 <b>95%</b></span><div><i style="width:95%"></i></div></div><div class="compliance-row"><span>NIST <b>93%</b></span><div><i style="width:93%"></i></div></div><div class="compliance-row"><span>PCI-DSS <b>90%</b></span><div><i style="width:90%"></i></div></div></div>
+        <div class="security-details"><div><span class="detail-icon">♧</span><section><strong>RBAC</strong><p>Users <b>124</b> <span>Active Sessions <b>8</b></span></p></section></div><div><span class="detail-icon">♙</span><section><strong>Encryption</strong><p>At Rest <b>AES-256</b> <span>In Transit <b>TLS 1.3</b></span></p></section></div><div><span class="detail-icon">▣</span><section><strong>Audit Trail</strong><p>Events (24h) <b>1,248</b> <span>Retention <b>365 days</b></span></p></section></div></div></div>
+      </article>
+    </section>
+    <footer><div class="tech-stack"><span>☁ AWS</span><span>◈ Azure</span><span>◆ GCP</span><span>♧ K8s</span><span>⚒ Terraform</span><span>▰ Docker</span></div><div>NEXUS CONTROL PLANE <b>v2.8.0</b>　|　Secure　·　Compliant　·　Always On</div></footer>
   </main>
 </div>
-<div class="toast-region" id="toasts"></div>
-<dialog id="assistantDialog"><form method="dialog" class="dialog-card"><button class="dialog-close" aria-label="Cerrar">×</button><div class="eyebrow">NEXUS INTELLIGENCE</div><h2>AI Assistant</h2><p>Asistente de demostración: consulta el estado de tus servicios, políticas o pipelines.</p><div class="assistant-prompt"><input id="assistantInput" placeholder="Ej. ¿Qué alertas críticas hay?"><button type="button" id="sendAssistant">Enviar</button></div><div id="assistantAnswer" class="assistant-answer">Prueba: “alertas”, “pipeline” o “governance”.</div></form></dialog>
+<div class="toast-region" id="toastRegion"></div>
+<dialog id="detailDialog"><div class="dialog-head"><div><span class="eyebrow">NEXUS / DETAILS</span><h2 id="dialogTitle">Details</h2></div><button class="icon-button" id="closeDialog">✕</button></div><div id="dialogContent"></div></dialog>
+<dialog id="aiDialog"><div class="dialog-head"><div><span class="eyebrow">NEXUS AI</span><h2>AI Assistant</h2></div><button class="icon-button" id="closeAi">✕</button></div><p class="muted">Demo local: consulta el estado de la plataforma, políticas o pipelines.</p><div class="chat-log" id="chatLog"><div class="chat-bubble bot">Hola. Puedo ayudarte a revisar Governance, Security, CI/CD o Infrastructure. ¿Qué quieres consultar?</div></div><form id="chatForm"><input id="chatInput" placeholder="Pregunta sobre el entorno..." autocomplete="off"><button class="run-btn">Enviar</button></form></dialog>
 <script src="app.js"></script>
-</body>
-</html>
+</body></html>
