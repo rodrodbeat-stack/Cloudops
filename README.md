@@ -49,3 +49,24 @@ Los botones DEV, QA, STAGING y PROD abren `environment.html?env=...`, un dashboa
 - `sg-graph.css` y `sg-graph.js`: estilos compartidos, selección de nodos, dependencias resaltadas, animación del flujo y logs de simulación.
 - Desde Overview, los paneles Security y Governance enlazan a sus respectivos dashboards.
 - Los flujos y métricas son demostrativos; no modifican políticas ni se conectan a cuentas reales.
+
+## Secure CI/CD GitHub Actions
+
+The workflow `.github/workflows/secure-cicd.yml` models this operational chain:
+
+`Commit → CI validation → Security Scan → Policy Validation → Package → GitHub Pages Deployment → Audit`
+
+Jobs included:
+
+1. **CI validation** — checks that key dashboard files exist and HTML files are not empty.
+2. **Security Scan** — runs Gitleaks and a lightweight check for common hard-coded credential patterns.
+3. **Policy Validation** — runs `scripts/policy-check.sh` for basic repository governance checks.
+4. **Package dashboard** — prepares the static site and uploads a GitHub Pages artifact.
+5. **Deployment** — deploys from `main` (not from pull requests) to GitHub Pages.
+6. **Audit & Evidence** — records commit, run metadata, stage results, and publishes an audit artifact retained for 90 days.
+
+### Enable GitHub Pages deployment
+
+In the repository, open **Settings → Pages** and configure **Build and deployment → Source: GitHub Actions**. Push the workflow to `main`. Pull requests run validation, scanning, and policy checks but do not deploy. A deployment requires the earlier jobs to succeed.
+
+> **Important:** These are starter guardrails for the static dashboard, not a complete enterprise security program. The checks are demonstrative and do not deploy workloads to AWS/Azure/GCP or validate real cloud resources. For production, pin third-party Actions to full commit SHAs, add dependency/SAST/DAST scanning and approvals as required, and replace the sample policy script with organization-specific policies (for example OPA/Conftest).
