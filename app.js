@@ -1,4 +1,4 @@
-/* NEXUS CloudOps Control Plane — interactive demo, no live cloud integrations */
+/* 888DIGITALFACTORY CloudOps Control Plane — interactive demo, no live cloud integrations */
 (() => {
   'use strict';
   const $ = (selector, root = document) => root.querySelector(selector);
