@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#041126">
+<title>NEXUS // Control Plane</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="#" data-page="overview">
+      <span class="brand-mark">N</span><span><strong>NEXUS <i>//</i></strong><small>CONTROL PLANE</small><em>GOVERNANCE · SECURITY · CI/CD</em></span>
+    </a>
+    <div class="nav-label">WORKSPACE</div>
+    <nav id="nav">
+      <button class="nav-item active" data-page="overview"><span>⌂</span>Overview</button>
+      <button class="nav-item" data-page="git"><span>⑂</span>Git Graph</button>
+      <button class="nav-item" data-page="governance"><span>⬡</span>Governance</button>
+      <button class="nav-item" data-page="security"><span>⛨</span>Security</button>
+      <button class="nav-item" data-page="cicd"><span>∞</span>CI/CD</button>
+      <button class="nav-item" data-page="infrastructure"><span>☁</span>Infrastructure</button>
+      <button class="nav-item" data-page="audit"><span>▤</span>Audit Logs</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="assistant-card"><div class="assistant-title">✳ AI ASSISTANT <span>↗</span></div><p>Explora el estado del entorno, las políticas y tus pipelines.</p><button id="askAssistant">Abrir asistente →</button></div>
+      <div class="cloud-legend"><span>☁ AWS</span><span>◈ Azure</span><span>⬡ GCP</span><span>⎈ K8s</span><span>⚙ Terraform</span></div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="mobile-brand">NEXUS <i>//</i></div>
+      <div class="env-switch" aria-label="Entorno"><button class="selected" data-env="PROD">PROD</button><button data-env="STAGING">STAGING</button><button data-env="DEV">DEV</button></div>
+      <label class="search"><span>⌕</span><input id="globalSearch" placeholder="Buscar repos, servicios, commits, políticas..."><kbd>↵</kbd></label>
+      <div class="system-status"><span class="pulse"></span><div><b>SYSTEM OPERATIONAL</b><small>Todos los sistemas saludables</small></div></div>
+      <button class="icon-button" id="notifications" title="Notificaciones">♧<sup>3</sup></button><button class="icon-button" title="Configuración" id="settings">⚙</button>
+    </header>
+    <section class="content">
+      <div class="page-heading"><div><div class="eyebrow">NEXUS / CONTROL CENTER</div><h1 id="pageTitle">Overview <span>↗</span></h1><p id="pageSubtitle">Vista operativa unificada de tu plataforma cloud.</p></div><div class="heading-actions"><span class="updated"><span class="pulse"></span> Datos de demostración</span><button class="btn-outline" id="refresh">↻ Actualizar</button></div></div>
+      <div id="pageContent"></div>
+      <footer><span>NEXUS CONTROL PLANE <b>v2.8.0</b></span><span>Secure · Compliant · Always On</span></footer>
+    </section>
+  </main>
+</div>
+<div class="toast-region" id="toasts"></div>
+<dialog id="assistantDialog"><form method="dialog" class="dialog-card"><button class="dialog-close" aria-label="Cerrar">×</button><div class="eyebrow">NEXUS INTELLIGENCE</div><h2>AI Assistant</h2><p>Asistente de demostración: consulta el estado de tus servicios, políticas o pipelines.</p><div class="assistant-prompt"><input id="assistantInput" placeholder="Ej. ¿Qué alertas críticas hay?"><button type="button" id="sendAssistant">Enviar</button></div><div id="assistantAnswer" class="assistant-answer">Prueba: “alertas”, “pipeline” o “governance”.</div></form></dialog>
+<script src="app.js"></script>
+</body>
+</html>
