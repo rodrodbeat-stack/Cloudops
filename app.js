@@ -27,68 +27,39 @@ $('#governanceDetails').addEventListener('click',()=>showDetails('Governance & S
 $('#alertsBtn').addEventListener('click',()=>$('#warnings').scrollIntoView({behavior:'smooth',block:'center'}));
 $('#closeDialog').addEventListener('click',()=>$('#detailDialog').close());
 $('#aiOpen').addEventListener('click',()=>$('#aiDialog').showModal());$('#closeAi').addEventListener('click',()=>$('#aiDialog').close());
-$$('#chatForm').addEventListener('submit', e => {
+$('#chatForm').addEventListener('submit', e => {
     e.preventDefault();
 
     const input = $('#chatInput');
-    const q = input.value.trim();
+    const question = input.value.trim();
 
-    if (!q) return;
+    if (!question) return;
 
     const log = $('#chatLog');
+    const user = document.createElement('div');
 
-    const userMessage = document.createElement('div');
-    userMessage.className = 'chat-bubble user';
-    userMessage.textContent = q;
-    log.append(userMessage);
+    user.className = 'chat-bubble user';
+    user.textContent = question;
+    log.append(user);
 
-    const botMessage = document.createElement('div');
-    botMessage.className = 'chat-bubble bot';
+    const bot = document.createElement('div');
+    bot.className = 'chat-bubble bot';
 
-    const question = q.toLowerCase();
+    const q = question.toLowerCase();
 
-    if (
-        question.includes('segur') ||
-        question.includes('vulner') ||
-        question.includes('iam')
-    ) {
-        botMessage.textContent =
-            'Hay 7 hallazgos de seguridad: 1 crítico, 2 altos y 4 medios.\n' +
-            'Prioridad: revisar los permisos IAM y ejecutar nuevamente el análisis de secretos.';
-    } else if (
-        question.includes('pipeline') ||
-        question.includes('cicd') ||
-        question.includes('deploy')
-    ) {
-        botMessage.textContent =
-            'El último pipeline de demostración registra un 98,4% de éxito. ' +
-            'Revisa el Security Gate antes de promover cambios a producción.';
-    } else if (
-        question.includes('governance') ||
-        question.includes('gobernanza') ||
-        question.includes('polic') ||
-        question.includes('tag')
-    ) {
-        botMessage.textContent =
-            'Governance Score: 96%. Hay 48 de 50 políticas conformes ' +
-            'y 3 recursos sin etiquetas obligatorias.';
-    } else if (
-        question.includes('infra') ||
-        question.includes('aws') ||
-        question.includes('azure') ||
-        question.includes('gcp')
-    ) {
-        botMessage.textContent =
-            'AWS, Azure y GCP están representados mediante datos de demostración. ' +
-            'Para obtener métricas reales, será necesario conectar sus APIs mediante un backend seguro.';
+    if (q.includes('seguridad') || q.includes('vulnerabilidad') || q.includes('iam')) {
+        bot.textContent = 'Seguridad: 7 hallazgos simulados. Hay 1 crítico, 2 altos y 4 medios. Revisa los permisos IAM y el análisis de secretos.';
+    } else if (q.includes('pipeline') || q.includes('cicd') || q.includes('deploy')) {
+        bot.textContent = 'CI/CD: el dashboard muestra un 98,4% de éxito simulado. Revisa el Security Gate antes de desplegar.';
+    } else if (q.includes('governance') || q.includes('gobernanza') || q.includes('policy') || q.includes('tag')) {
+        bot.textContent = 'Governance: puntuación simulada del 96%, con 48 de 50 políticas conformes y 3 recursos sin etiquetas obligatorias.';
+    } else if (q.includes('aws') || q.includes('azure') || q.includes('gcp') || q.includes('infraestructura')) {
+        bot.textContent = 'Infrastructure: AWS, Azure y GCP aparecen como conectores de demostración. Todavía no hay conexión con servicios reales.';
     } else {
-        botMessage.textContent =
-            'Resumen de demostración: Governance 96%, Pipeline Success 98,4%, ' +
-            '7 hallazgos de seguridad y 3 incumplimientos de políticas. ' +
-            'Puedes consultar sobre seguridad, CI/CD, gobernanza o infraestructura.';
+        bot.textContent = 'CloudOps Assistant: puedo ayudarte con seguridad, CI/CD, gobernanza e infraestructura. Los indicadores actuales son datos de demostración.';
     }
 
-    log.append(botMessage);
+    log.append(bot);
     input.value = '';
     log.scrollTop = log.scrollHeight;
 });
