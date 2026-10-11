@@ -29,3 +29,7 @@ Esta versión es una interfaz de demostración: los indicadores, eventos, conect
 - El módulo CI/CD del Overview ahora abre `cicd.html`.
 
 Todo es una simulación visual local. No se conectan runners, repositorios, cuentas cloud ni despliegues reales.
+
+## Dashboards por entorno
+
+Los botones DEV, QA, STAGING y PROD abren `environment.html?env=...`, un dashboard separado por entorno con métricas y acciones de demostración. Los botones no realizan cambios reales en AWS, Azure ni Kubernetes.

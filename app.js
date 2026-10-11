@@ -33,11 +33,8 @@
   $$('[data-jump]').forEach(btn => btn.addEventListener('click', () => jump(btn.dataset.jump)));
 
   $$('.env[data-env]').forEach(btn => btn.addEventListener('click', () => {
-    $$('.env').forEach(x => x.classList.toggle('active', x === btn));
     const env = btn.dataset.env;
-    if ($('#currentEnv')) $('#currentEnv').textContent = env;
-    if ($('#pipelineEnvLabel')) $('#pipelineEnvLabel').textContent = env;
-    toast(`Entorno activo: ${env}. La selección solo cambia la demo; no modifica recursos reales.`);
+    window.location.href = `environment.html?env=${encodeURIComponent(env)}&from=overview`;
   }));
 
   safeOn('#refreshBtn', 'click', () => {
