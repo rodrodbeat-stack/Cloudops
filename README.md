@@ -41,3 +41,11 @@ Los botones DEV, QA, STAGING y PROD abren `environment.html?env=...`, un dashboa
 - `Run traffic flow` anima conexiones y registra eventos de simulación.
 - Los diagramas y métricas son ilustrativos; no representan cuentas ni tráfico cloud reales.
 - Archivos añadidos: `infrastructure.html`, `infrastructure.css`, `infrastructure.js`.
+
+
+## Security & Governance Architecture Graphs
+- `security.html`: grafo interactivo de identidad, edge protection, posture, secretos, pipeline scanning, workloads, detección y auditoría.
+- `governance.html`: grafo interactivo de organización, políticas, RBAC, costos/tags, landing zones, estándares, compliance y evidencias.
+- `sg-graph.css` y `sg-graph.js`: estilos compartidos, selección de nodos, dependencias resaltadas, animación del flujo y logs de simulación.
+- Desde Overview, los paneles Security y Governance enlazan a sus respectivos dashboards.
+- Los flujos y métricas son demostrativos; no modifican políticas ni se conectan a cuentas reales.
