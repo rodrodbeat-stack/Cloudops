@@ -25,10 +25,10 @@ Esta versión es una interfaz de demostración: los indicadores, eventos, conect
 ## CI/CD Command Center (página nueva)
 - `cicd.html`: dashboard independiente de CI/CD.
 - `cicd.css`: estilos específicos del dashboard CI/CD.
-- `cicd.js`: interacción, animación de etapas/branches, logs, historial y exportación CSV.
+- `cicd.js`: interacción, animación de etapas/branches, logs, historial, exportación CSV e integración de solo lectura con la API pública de GitHub Actions.
 - El módulo CI/CD del Overview ahora abre `cicd.html`.
 
-Todo es una simulación visual local. No se conectan runners, repositorios, cuentas cloud ni despliegues reales.
+El botón **Run demo pipeline** solo anima una ejecución local. El botón **Sync GitHub** consulta la última ejecución real del workflow `secure-cicd.yml` del repositorio público `rodrodbeat-stack/Cloudops` y muestra estados de jobs, commit y run. La consulta usa la API pública de GitHub y no necesita un token mientras el repositorio sea público; los estados se refrescan manualmente o cada 60 segundos. Si la API no está disponible, el panel indica el problema y la demo sigue funcionando.
 
 ## Dashboards por entorno
 
@@ -70,3 +70,7 @@ Jobs included:
 In the repository, open **Settings → Pages** and configure **Build and deployment → Source: GitHub Actions**. Push the workflow to `main`. Pull requests run validation, scanning, and policy checks but do not deploy. A deployment requires the earlier jobs to succeed.
 
 > **Important:** These are starter guardrails for the static dashboard, not a complete enterprise security program. The checks are demonstrative and do not deploy workloads to AWS/Azure/GCP or validate real cloud resources. For production, pin third-party Actions to full commit SHAs, add dependency/SAST/DAST scanning and approvals as required, and replace the sample policy script with organization-specific policies (for example OPA/Conftest).
+
+### CI/CD en vivo desde GitHub Actions
+
+El dashboard `cicd.html` consulta `GET /repos/rodrodbeat-stack/Cloudops/actions/workflows/secure-cicd.yml/runs` y el endpoint de jobs de la ejecución más reciente. Las tarjetas corresponden a Commit, CI Validation, Security Scan, Policy Validation, Package Artifact, Deployment y Audit & Evidence. Esto es una vista de solo lectura: no inicia workflows ni modifica infraestructura. Para publicar correctamente, habilita **Settings → Pages → Source: GitHub Actions** y confirma que `.github/workflows/secure-cicd.yml` esté en `main`.
