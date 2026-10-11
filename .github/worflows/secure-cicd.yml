@@ -1,0 +1,168 @@
+name: 888DIGITALFACTORY | Secure CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudops-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci-validation:
+    name: "1 · Commit → CI validation"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Validate required dashboard files
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in index.html styles.css app.js cicd.html security.html governance.html infrastructure.html environment.html; do
+            if [[ ! -f "$file" ]]; then
+              echo "::error file=$file::Required file is missing"
+              exit 1
+            fi
+            echo "OK: $file"
+          done
+      - name: Check HTML files are non-empty
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            test -s "$file" || { echo "::error file=$file::Empty HTML file"; exit 1; }
+            grep -qi '<!doctype html\|<html' "$file" || { echo "::error file=$file::No HTML document declaration found"; exit 1; }
+            echo "Validated $file"
+          done < <(find . -maxdepth 2 -type f -name '*.html' -print0)
+
+  security-scan:
+    name: "2 · Security Scan"
+    runs-on: ubuntu-latest
+    needs: ci-validation
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan repository for leaked secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check for risky inline patterns
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Lightweight demo guardrail. Review findings manually before production use.
+          if grep -RniE --include='*.html' --include='*.js' --include='*.css' \
+            '(AKIA[0-9A-Z]{16}|-----BEGIN.*PRIVATE KEY-----)' \
+            --exclude-dir=.git .; then
+            echo '::error::Potential credential/private-key pattern detected. Review the match.'
+            exit 1
+          fi
+          echo 'No common hard-coded credential patterns detected.'
+
+  policy-validation:
+    name: "3 · Policy Validation"
+    runs-on: ubuntu-latest
+    needs: [ci-validation, security-scan]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Validate repository policies
+        run: bash scripts/policy-check.sh
+
+  build-artifact:
+    name: "4 · Package dashboard"
+    runs-on: ubuntu-latest
+    needs: policy-validation
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Prepare GitHub Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          # Publish only the static web application, not workflow or script sources.
+          cp -R ./*.html ./*.css ./*.js README.md _site/
+          test -s _site/index.html
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deployment:
+    name: "5 · Deployment → GitHub Pages"
+    runs-on: ubuntu-latest
+    needs: build-artifact
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  audit:
+    name: "6 · Audit & Evidence"
+    runs-on: ubuntu-latest
+    needs: [ci-validation, security-scan, policy-validation, build-artifact, deployment]
+    if: always()
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Generate execution evidence
+        shell: bash
+        env:
+          CI_RESULT: ${{ needs.ci-validation.result }}
+          SECURITY_RESULT: ${{ needs.security-scan.result }}
+          POLICY_RESULT: ${{ needs.policy-validation.result }}
+          BUILD_RESULT: ${{ needs.build-artifact.result }}
+          DEPLOY_RESULT: ${{ needs.deployment.result }}
+        run: |
+          set -euo pipefail
+          mkdir -p audit-evidence
+          {
+            echo '# 888DIGITALFACTORY — Pipeline Audit Evidence'
+            echo
+            echo "- Repository: ${GITHUB_REPOSITORY}"
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Ref: ${GITHUB_REF}"
+            echo "- Trigger: ${GITHUB_EVENT_NAME}"
+            echo "- Run ID: ${GITHUB_RUN_ID}"
+            echo "- Run number: ${GITHUB_RUN_NUMBER}"
+            echo "- Timestamp (UTC): $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo '| Stage | Result |'
+            echo '|---|---|'
+            echo "| CI validation | ${CI_RESULT} |"
+            echo "| Security scan | ${SECURITY_RESULT} |"
+            echo "| Policy validation | ${POLICY_RESULT} |"
+            echo "| Build artifact | ${BUILD_RESULT} |"
+            echo "| Deployment | ${DEPLOY_RESULT} |"
+          } > audit-evidence/pipeline-audit.md
+          cat audit-evidence/pipeline-audit.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 888digitalfactory-audit-${{ github.run_number }}
+          path: audit-evidence/pipeline-audit.md
+          if-no-files-found: error
+          retention-days: 90
