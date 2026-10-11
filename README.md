@@ -1,4 +1,4 @@
-# 888DIGITALFACTORY // CloudOps Control Plane
+# 888DIGITALFACTORY // CloudOps Control Planek
 
 Dashboard web estático de demostración para CloudOps / DevSecOps con estética oscura, acentos neón, navegación por módulos e interacciones locales.
 
