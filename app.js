@@ -27,5 +27,72 @@ $('#governanceDetails').addEventListener('click',()=>showDetails('Governance & S
 $('#alertsBtn').addEventListener('click',()=>$('#warnings').scrollIntoView({behavior:'smooth',block:'center'}));
 $('#closeDialog').addEventListener('click',()=>$('#detailDialog').close());
 $('#aiOpen').addEventListener('click',()=>$('#aiDialog').showModal());$('#closeAi').addEventListener('click',()=>$('#aiDialog').close());
-$('#chatForm').addEventListener('submit',e=>{e.preventDefault();const input=$('#chatInput');const q=input.value.trim();if(!q)return;const log=$('#chatLog');const u=document.createElement('div');u.className='chat-bubble user';u.textContent=q;log.append(u);const b=document.createElement('div');b.className='chat-bubble bot';const low=q.toLowerCase();if(low.includes('segur')||low.includes('vulner')||low.includes('iam'))b.textContent='Hay 7 findings de seguridad: 1 crítico, 2 altos y 4 medios. Prioridad sugerida: revisar el drift IAM de app-prod y volver a ejecutar el secret scan del repositorio payments.';else if(low.includes('pipeline')||low.includes('cicd')||low.includes('deploy'))b.textContent='El último pipeline (#482) registra 98,4% de éxito. Source, Build, SAST y QA pasaron; Security Gate mantiene 1 warning. Valida el hallazgo antes de promover a producción.';else if(low.includes('governance')||low.includes('polic')||low.includes('tag'))b.textContent='Governance Score: 96%. Hay 48/50 políticas conformes y 3 recursos sin tags obligatorios. Revisa Owner, Environment y CostCenter para mejorar trazabilidad y costes.';else if(low.includes('infra')||low.includes('aws')||low.includes('azure')||low.includes('gcp'))b.textContent='La consola muestra AWS, Azure y GCP como conectores de demostración. Para telemetría real, integra APIs mediante un backend seguro y credenciales de mínimo privilegio.';else b.textContent='Resumen del entorno de demostración: Governance 96%, Pipeline Success 98,4%, 7 findings de seguridad y 3 policy violations. Puedes preguntar por seguridad, pipeline, governance o infraestructura.';log.append(b);input.value='';log.scrollTop=log.scrollHeight;});
-$('#clock').textContent='Updated just now';
+$$('#chatForm').addEventListener('submit', e => {
+    e.preventDefault();
+
+    const input = $('#chatInput');
+    const q = input.value.trim();
+
+    if (!q) return;
+
+    const log = $('#chatLog');
+
+    const userMessage = document.createElement('div');
+    userMessage.className = 'chat-bubble user';
+    userMessage.textContent = q;
+    log.append(userMessage);
+
+    const botMessage = document.createElement('div');
+    botMessage.className = 'chat-bubble bot';
+
+    const question = q.toLowerCase();
+
+    if (
+        question.includes('segur') ||
+        question.includes('vulner') ||
+        question.includes('iam')
+    ) {
+        botMessage.textContent =
+            'Hay 7 hallazgos de seguridad: 1 crítico, 2 altos y 4 medios.\n' +
+            'Prioridad: revisar los permisos IAM y ejecutar nuevamente el análisis de secretos.';
+    } else if (
+        question.includes('pipeline') ||
+        question.includes('cicd') ||
+        question.includes('deploy')
+    ) {
+        botMessage.textContent =
+            'El último pipeline de demostración registra un 98,4% de éxito. ' +
+            'Revisa el Security Gate antes de promover cambios a producción.';
+    } else if (
+        question.includes('governance') ||
+        question.includes('gobernanza') ||
+        question.includes('polic') ||
+        question.includes('tag')
+    ) {
+        botMessage.textContent =
+            'Governance Score: 96%. Hay 48 de 50 políticas conformes ' +
+            'y 3 recursos sin etiquetas obligatorias.';
+    } else if (
+        question.includes('infra') ||
+        question.includes('aws') ||
+        question.includes('azure') ||
+        question.includes('gcp')
+    ) {
+        botMessage.textContent =
+            'AWS, Azure y GCP están representados mediante datos de demostración. ' +
+            'Para obtener métricas reales, será necesario conectar sus APIs mediante un backend seguro.';
+    } else {
+        botMessage.textContent =
+            'Resumen de demostración: Governance 96%, Pipeline Success 98,4%, ' +
+            '7 hallazgos de seguridad y 3 incumplimientos de políticas. ' +
+            'Puedes consultar sobre seguridad, CI/CD, gobernanza o infraestructura.';
+    }
+
+    log.append(botMessage);
+    input.value = '';
+    log.scrollTop = log.scrollHeight;
+});
+
+if ($('#clock')) {
+    $('#clock').textContent = 'Updated just now';
+}
