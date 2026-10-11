@@ -15,7 +15,7 @@ if grep -RniE '^permissions:[[:space:]]*(write-all|admin)' .github/workflows; th
 fi
 
 # Ensure no obvious private key material is committed in text files.
-if grep -RIl --exclude-dir=.git --exclude='*.png' --exclude='*.jpg' \
+if grep -RIl --exclude-dir=.git --exclude='*.png' --exclude='*.jpg' --exclude='policy-check.sh' \
   'BEGIN .*PRIVATE KEY' .; then
   fail 'Private key marker found in repository. Remove the key and rotate it if real.'
 fi
