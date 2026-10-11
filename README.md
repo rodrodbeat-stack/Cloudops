@@ -20,3 +20,12 @@ Dashboard web estático de demostración para CloudOps / DevSecOps con estética
 
 ## Importante
 Esta versión es una interfaz de demostración: los indicadores, eventos, conectores cloud y resultados de pipeline son ficticios. No se conecta a cuentas reales ni realiza despliegues. Para producción, conectar APIs con autenticación y autorización del lado servidor.
+
+
+## CI/CD Command Center (página nueva)
+- `cicd.html`: dashboard independiente de CI/CD.
+- `cicd.css`: estilos específicos del dashboard CI/CD.
+- `cicd.js`: interacción, animación de etapas/branches, logs, historial y exportación CSV.
+- El módulo CI/CD del Overview ahora abre `cicd.html`.
+
+Todo es una simulación visual local. No se conectan runners, repositorios, cuentas cloud ni despliegues reales.

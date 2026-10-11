@@ -20,6 +20,7 @@
     audit: ['AUDIT LOGS', 'Audit Logs']
   };
   function jump(id) {
+    if (id === 'cicd' && !document.body.classList.contains('cicd-page')) { window.location.href = 'cicd.html'; return; }
     const target = document.getElementById(id); if (!target) { toast(`Módulo ${id} no disponible.`); return; }
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     $$('.nav-item').forEach(btn => btn.classList.toggle('active', btn.dataset.target === id));
